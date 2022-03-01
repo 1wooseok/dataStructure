@@ -8,4 +8,4 @@ hs.insert("하나", "one");
 hs.insert("둘", "two");
 hs.insert("셋", "three");
 hs.insert("닭", "chicken");
-hs.render();
+hs.mount();

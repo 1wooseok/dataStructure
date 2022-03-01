@@ -17,7 +17,6 @@ export default class Hash {
   }
 
   delete(key) {
-    const ul = document.querySelector("ul");
     let prev = null;
     let node = this.table[this.hashFn(key)];
     while (node) {
@@ -27,24 +26,12 @@ export default class Hash {
         } else {
           prev.next = node.next;
         }
-        return (ul.innerHTML = `${arr
-          .map(
-            (word, idx) =>
-              `<li id="${Object.keys(word)}">
-                <span>
-                  ${Object.keys(word)} - ${Object.values(word)} 
-                </span>
-                <button>
-                  삭제
-                </button>
-              </li>`
-          )
-          .join(" ")}`);
+        const ul = document.querySelector("ul");
+        return this.renderList(ul);
       }
       prev = node;
       node = node.next;
     }
-    this.render();
   }
 
   search(key) {
@@ -67,36 +54,10 @@ export default class Hash {
     );
   }
 
-  render() {
-    const arr = [];
-    this.table.forEach((word) => {
-      if (word) {
-        arr.push(word.entry);
-        let node = word.next;
-        while (node) {
-          arr.push(node.entry);
-          node = node.next;
-        }
-      }
-    });
-
+  mount() {
     root.innerHTML = `
       <div style="display: flex; justify-content: center;">
-        <ul>
-          ${arr
-            .map(
-              (word, idx) =>
-                `<li id="${Object.keys(word)}">
-                  <span>
-                    ${Object.keys(word)} - ${Object.values(word)} 
-                  </span>
-                  <button>
-                    삭제
-                  </button>
-                </li>`
-            )
-            .join(" ")}
-        </ul>
+        <ul></ul>
         <form style="margin: 1em 0 0 3em">
           <input class="search_input" placeholder="영단어 입력" type="text"/>
           <button class="search_btn">검색</button>
@@ -104,14 +65,9 @@ export default class Hash {
         </form>
       </div>
     `;
-
-    const ul = document.querySelector("ul");
-    ul.addEventListener("click", (e) => {
-      if (e.target.nodeName === "BUTTON") {
-        this.delete(e.target.parentNode.id);
-      }
-    });
-
+    
+    this.renderList();
+    
     const search_input = document.querySelector(".search_input");
     const search_btn = document.querySelector(".search_btn");
     search_btn.addEventListener("click", (e) => {
@@ -119,32 +75,38 @@ export default class Hash {
       this.search(search_input.value);
     });
   }
-}
 
-function renderList(table, el) {
-  const arr = [];
-  table.forEach((word) => {
-    if (word) {
-      arr.push(word.entry);
-      let node = word.next;
-      while (node) {
-        arr.push(node.entry);
-        node = node.next;
+  renderList() {
+    const arr = [];
+    this.table.forEach((word) => {
+      while(word) {
+        arr.push(word.entry);
+        word = word.next;
+      } 
+    });
+
+    const ul = document.querySelector("ul");
+
+    ul.addEventListener("click", (e) => {
+      if (e.target.nodeName === "BUTTON") {
+        this.delete(e.target.parentNode.id);
       }
-    }
-  });
+    });
 
-  el.innerHTML = `${arr
-    .map(
-      (word, idx) =>
-        `<li id="${Object.keys(word)}">
-          <span>
-            ${Object.keys(word)} - ${Object.values(word)} 
-          </span>
-          <button>
-            삭제
-          </button>
-        </li>`
-    )
-    .join(" ")}`;
+    ul.innerHTML = `
+      ${arr
+        .map(
+          (word, idx) =>
+            `<li id="${Object.keys(word)}">
+              <span>
+                ${Object.keys(word)} - ${Object.values(word)} 
+              </span>
+              <button>
+                삭제
+              </button>
+            </li>`
+        )
+        .join(" ")}
+    `;
+  }
 }
