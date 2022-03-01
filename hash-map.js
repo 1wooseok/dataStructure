@@ -69,21 +69,7 @@ export default class Hash {
 
     root.innerHTML = `
       <div style="display: flex; justify-content: center;">
-        <ul>
-          ${arr
-            .map(
-              (word, idx) =>
-                `<li id="${Object.keys(word)}">
-                  <span>
-                    ${Object.keys(word)} - ${Object.values(word)} 
-                  </span>
-                  <button>
-                    삭제
-                  </button>
-                </li>`
-            )
-            .join(" ")}
-        </ul>
+        <ul></ul>
         <form style="margin: 1em 0 0 3em">
           <input class="search_input" placeholder="영단어 입력" type="text"/>
           <button class="search_btn">검색</button>
@@ -93,6 +79,7 @@ export default class Hash {
     `;
 
     const ul = document.querySelector("ul");
+    renderList()
     ul.addEventListener("click", (e) => {
       if (e.target.nodeName === "BUTTON") {
         this.delete(e.target.parentNode.id);
