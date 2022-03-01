@@ -17,33 +17,33 @@ export default class Hash {
   }
 
   delete(key) {
-    // key = String(key);
-    let iterater = this.table[this.hashFn(key)];
-    console.log(key[0]);
-    if (Object.keys(iterater.entry)[0] === key[0]) {
-      this.table[this.hashFn(key)] = iterater.next;
-      console.log(this.table);
-    }
-    while (true) {
-      if (Object.keys(iterater.entry)[0] === key[0]) {
-        iterater.next = iterater.next.next;
+    let prev = null;
+    let node = this.table[this.hashFn(key)];
+    while (node) {
+      if (String(key) === String(Object.keys(node.entry))) {
+        if (!prev) {
+          this.table[this.hashFn(key)] = node.next;
+        } else {
+          prev.next = node.next;
+        }
+        return this.render();
       }
-      iterater = iterater.next;
+      prev = node;
+      node = node.next;
     }
-    return this.render();
+    this.render();
   }
 
   search(key) {
-    let iterater = this.table[this.hashFn(key)];
-    if (!iterater) {
-      return "존재하지 않는 단어";
-    }
-    while (true) {
-      if (iterater.entry[key]) {
-        return iterater.entry[key];
+    const search_textNode = document.querySelector('.search_value');
+    let node = this.table[this.hashFn(key)];
+    while(node) {
+      if(String(Object.keys(node.entry)) === String(key)) {
+        return search_textNode.textContent = `${key} - ${node.entry[key]}`;
       }
-      iterater = iterater.next;
+      node = node.next;
     }
+    return search_textNode.textContent = '입력한 단어가 존재하지 않습니다.';
   }
 
   hashFn(key) {
@@ -59,34 +59,51 @@ export default class Hash {
     this.table.forEach((word) => {
       if (word) {
         arr.push(word.entry);
-        let iterater = word.next;
-        while (iterater) {
-          arr.push(iterater.entry);
-          iterater = iterater.next;
+        let node = word.next;
+        while (node) {
+          arr.push(node.entry);
+          node = node.next;
         }
       }
     });
+
     root.innerHTML = `
+      <div style="display: flex; justify-content: center;">
         <ul>
           ${arr
             .map(
-              (word) =>
-                `<li>
+              (word, idx) =>
+                `<li id="${Object.keys(word)}">
                   <span>
                     ${Object.keys(word)} - ${Object.values(word)} 
                   </span>
-                  <button class="del" onClick=${this.delete(Object.keys(word))}>
+                  <button>
                     삭제
                   </button>
                 </li>`
             )
             .join(" ")}
         </ul>
-        <input placeholder="영단어 입력" type="text"/>
-        <button>검색</button>
+        <form style="margin: 1em 0 0 3em">
+          <input class="search_input" placeholder="영단어 입력" type="text"/>
+          <button class="search_btn">검색</button>
+          <p class="search_value"></p>
+        </form>
+      </div>
     `;
 
-    const del_btn = document.querySelector('.del');
-    del_btn.addEventListener('click', this.delete(Object.keys(word)));
+    const ul = document.querySelector("ul");
+    ul.addEventListener("click", (e) => {
+      if (e.target.nodeName === "BUTTON") {
+        this.delete(e.target.parentNode.id);
+      }
+    });
+
+    const search_input = document.querySelector('.search_input');
+    const search_btn = document.querySelector('.search_btn');
+    search_btn.addEventListener('click', e => {
+      e.preventDefault();
+      this.search(search_input.value);
+    })
   }
 }
