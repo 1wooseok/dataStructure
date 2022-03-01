@@ -17,6 +17,7 @@ export default class Hash {
   }
 
   delete(key) {
+    const ul = document.querySelector("ul");
     let prev = null;
     let node = this.table[this.hashFn(key)];
     while (node) {
@@ -26,7 +27,19 @@ export default class Hash {
         } else {
           prev.next = node.next;
         }
-        return this.render();
+        return (ul.innerHTML = `${arr
+          .map(
+            (word, idx) =>
+              `<li id="${Object.keys(word)}">
+                <span>
+                  ${Object.keys(word)} - ${Object.values(word)} 
+                </span>
+                <button>
+                  삭제
+                </button>
+              </li>`
+          )
+          .join(" ")}`);
       }
       prev = node;
       node = node.next;
@@ -35,15 +48,15 @@ export default class Hash {
   }
 
   search(key) {
-    const search_textNode = document.querySelector('.search_value');
+    const search_textNode = document.querySelector(".search_value");
     let node = this.table[this.hashFn(key)];
-    while(node) {
-      if(String(Object.keys(node.entry)) === String(key)) {
-        return search_textNode.textContent = `${key} - ${node.entry[key]}`;
+    while (node) {
+      if (String(Object.keys(node.entry)) === String(key)) {
+        return (search_textNode.textContent = `${key} - ${node.entry[key]}`);
       }
       node = node.next;
     }
-    return search_textNode.textContent = '입력한 단어가 존재하지 않습니다.';
+    return (search_textNode.textContent = "입력한 단어가 존재하지 않습니다.");
   }
 
   hashFn(key) {
@@ -99,11 +112,39 @@ export default class Hash {
       }
     });
 
-    const search_input = document.querySelector('.search_input');
-    const search_btn = document.querySelector('.search_btn');
-    search_btn.addEventListener('click', e => {
+    const search_input = document.querySelector(".search_input");
+    const search_btn = document.querySelector(".search_btn");
+    search_btn.addEventListener("click", (e) => {
       e.preventDefault();
       this.search(search_input.value);
-    })
+    });
   }
+}
+
+function renderList(table, el) {
+  const arr = [];
+  table.forEach((word) => {
+    if (word) {
+      arr.push(word.entry);
+      let node = word.next;
+      while (node) {
+        arr.push(node.entry);
+        node = node.next;
+      }
+    }
+  });
+
+  el.innerHTML = `${arr
+    .map(
+      (word, idx) =>
+        `<li id="${Object.keys(word)}">
+          <span>
+            ${Object.keys(word)} - ${Object.values(word)} 
+          </span>
+          <button>
+            삭제
+          </button>
+        </li>`
+    )
+    .join(" ")}`;
 }
