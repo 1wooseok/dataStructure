@@ -1,19 +1,28 @@
 import { Node, Entry } from "./node.js";
+import { checkKor, checkEng } from "./regex.js";
 
 export default class Hash {
-  constructor(M) {
-    this.M = M; // 테이블 크기
-    this.table = Array(M); // 테이블 배열로 관리
+  constructor(size) {
+    this.size = size; 
+    this.table = Array(size);
   }
 
   insert(key, value) {
     const hash_key = this.hashFn(key);
-    if (!this.table[hash_key]) {
+    let node = this.table[hash_key];
+    if (!node) {
       this.table[hash_key] = new Node(Entry(key, value), null);
-      return;
+      return this.renderList();
     }
-    const new_entry = new Node(Entry(key, value), this.table[hash_key].next);
-    this.table[hash_key].next = new_entry;
+    while(node) {
+      if(String(key) === String(Object.keys(node.entry))) {
+        return alert('이미 존재하는 단어');
+      }
+      node = node.next;
+    }
+    const new_node = new Node(Entry(key, value), this.table[hash_key].next);
+    this.table[hash_key].next = new_node;
+    return this.renderList();
   }
 
   delete(key) {
@@ -26,8 +35,7 @@ export default class Hash {
         } else {
           prev.next = node.next;
         }
-        const ul = document.querySelector("ul");
-        return this.renderList(ul);
+        return this.renderList();
       }
       prev = node;
       node = node.next;
@@ -50,7 +58,7 @@ export default class Hash {
     return (
       String(key)
         .split("")
-        .reduce((acc, curr) => acc + curr.charCodeAt(), 0) % this.M
+        .reduce((acc, curr) => acc + curr.charCodeAt(), 0) % this.size
     );
   }
 
@@ -62,22 +70,22 @@ export default class Hash {
           <input class="search_input" placeholder="영단어 입력" type="text"/>
           <button class="search_btn">검색</button>
           <p class="search_value"></p>
+
+          <input class="word" placeholder="한글"/>
+          <input class="meaning" placeholder="영어" />
+          <button class="add_btn">입력</button>
         </form>
       </div>
     `;
-    
-    this.renderList();
-    
-    const search_input = document.querySelector(".search_input");
-    const search_btn = document.querySelector(".search_btn");
-    search_btn.addEventListener("click", (e) => {
+    const form = document.querySelector("form");
+    form.addEventListener('click', e => {
       e.preventDefault();
-      this.search(search_input.value);
-    });
+      this.btnHandler(e);
+    })
   }
 
   renderList() {
-    const arr = [];
+    let arr = [];
     this.table.forEach((word) => {
       while(word) {
         arr.push(word.entry);
@@ -108,5 +116,18 @@ export default class Hash {
         )
         .join(" ")}
     `;
+  }
+
+  btnHandler(e) {
+    switch (e.target.className) {
+      case 'search_btn':
+        return this.search(document.querySelector(".search_input").value);
+      case 'add_btn':
+        const key = document.querySelector('.word').value;
+        const value = document.querySelector('.meaning').value;
+        checkKor(key) && checkEng(value) && this.insert(key, value);
+      default:
+        return;
+    }
   }
 }
