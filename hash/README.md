@@ -1,23 +1,6 @@
-# 해싱
-아파트 우편함을 예로 들자면,
+# 해싱 테이블을 사용한 단어장
 
-아파트에서 우편물이 도착했을때 모든 우편물을 한곳에 모아두지 않고
-
-미리 지정된 호수에 맞게 우편을 전달한다.
-
-이렇게 하면 우편물을 찾을때 모든 우편을 다 확인하지 않고도
-
-호실만 알고있다면 원하는 우편을 빠르게 찾을 수 있다.
-
-<br>
-
-우편이 ㅇㅇㅇ호 우편함에 전달되는 것 처럼 
-
-해싱은 데이터가 저장될 위치를 미리 계산하고 그 위치에 데이터를 담는다.
-
-저장되어야 할 위치는 '해시 함수'를 통해 계산하고,
-
-계산된 위치에 데이터를 저장한 테이블을 '해시 테이블'이라고 한다.
+<img src="./해시단어장.png" />
 
 <br>
 <br>
@@ -26,7 +9,7 @@
 
 해시함수로 가장 간단한 제산함수를 사용.
 
-( * 제산함수 : '탐색 key % Table SIZE' 를 해시 주소로 사용 )
+( \* 제산함수 : '탐색 key % Table SIZE' 를 해시 주소로 사용 )
 
 ```jsx
  hashFn(key) {
@@ -43,20 +26,50 @@
 
 ## 오버플로
 
-만약 해시함수를 거쳐서 나온 주소에 이미 다른 데이터가 존재한다면 어떻게 할까?
+체이닝으로 오버플로 처리.
 
-이렇게 서로 다른 키가 같은 주소로 계산되는 상황을 '충돌'이라 하고
+버킷을 연결 리스트로 구현해 하나의 버킷에 여러개의 자료를 담음.
 
-충돌이 슬롯 수보다 더 많이 발생하는 상황을 '오버플로'라 한다.
+( \*오버플로 : 충돌이 슬롯 수보다 더 많이 발생하는 상황 )
 
-<br>
+```jsx
+insert(key, value) {
+    const hash_key = this.hashFn(key);
+    let node = this.table[hash_key];
+    if (!node) {
+      this.table[hash_key] = new Node(Entry(key, value), null);
+      return this.renderList();
+    }
+    while(node) {
+      if(String(key) === String(Object.keys(node.entry))) {
+        return alert('이미 존재하는 단어');
+      }
+      node = node.next;
+    }
+    const new_node = new Node(Entry(key, value), this.table[hash_key].next);
+    this.table[hash_key].next = new_node;
+    return this.renderList();
+  }
+```
 
-오버플로의 해결책으로는 여러가지가 있다.
+## 탐색 효율
 
-['선형 ...', '해시 체이닝'];
+리스트로 구현할 경우 탐색을 위해 모든 엔트리를 확인해야 하는 반면,
 
+해시 함수를 거쳐 나온 주소의 연결리스트만 탐색하기때문에
 
+훨씬 효율적.
 
-
-
-
+```jsx
+search(key) {
+    const search_textNode = document.querySelector(".search_value");
+    let node = this.table[this.hashFn(key)];
+    while (node) {
+      if (String(Object.keys(node.entry)) === String(key)) {
+        return (search_textNode.textContent = `${key} - ${node.entry[key]}`);
+      }
+      node = node.next;
+    }
+    return (search_textNode.textContent = "입력한 단어가 존재하지 않습니다.");
+  }
+```
