@@ -4,11 +4,13 @@
 
 // 원형 큐는 포인터 역할을 하는 변수를 사용해 삽입, 삭제 연산 수행 
 
-class CircularQueue {
+// module.exports = class CircularQueue {
+export default class CircularQueue {
   constructor(SIZE) {
+    this.SIZE = SIZE;
+    this.queue = Array(this.SIZE).fill(null);
     this.front = 0;
     this.rear = 0;
-    this.queue = Array(SIZE);
   }
 
   isEmpty() {
@@ -43,5 +45,10 @@ class CircularQueue {
 
   size() {
     return (this.rear - this.front + this.SIZE) % this.SIZE;
+  }
+
+  display() {
+    console.log({ "LEFT": this.rear, "RIGHT": this.front });
+    console.log(this.queue)
   }
 }
