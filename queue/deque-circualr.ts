@@ -1,12 +1,12 @@
-// const CircularQueue = require("./circular-queue");
-import CircularQueue from "./circular-queue.js";
+const CircularQueue = require("./circular-queue");
 
 class Deque extends CircularQueue {
-  constructor(SIZE) {
+  SIZE: number;
+  constructor(SIZE: number) {
     super(SIZE);
   }
 
-  pushRight(item) {
+  pushRight(item: any) {
     super.enqueue(item);
   }
 
@@ -18,7 +18,7 @@ class Deque extends CircularQueue {
     return super.peek();
   }
 
-  pushLeft(item) {
+  pushLeft(item: any) {
     if (super.isFull()) {
       throw new Error("포화상태 입니다.");
     }
@@ -30,7 +30,7 @@ class Deque extends CircularQueue {
     if (super.isEmpty()) {
       throw new Error("삭제할 요소가 없습니다.");
     }
-    result = this.queue[this.rear];
+    let result = this.queue[this.rear];
     this.rear = this.rear - 1 < 0 ? this.SIZE - 1 : this.rear - 1;
 
     return result;
@@ -41,4 +41,4 @@ class Deque extends CircularQueue {
   }
 }
 
-const deq = new Deque(10);
+const deque = new Deque(10);
