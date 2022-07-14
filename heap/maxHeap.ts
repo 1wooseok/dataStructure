@@ -31,13 +31,11 @@ export class MaxHeap implements MaxHeapInterface {
   }
 
   getLeft(idx: number): number {
-    idx *= 2
-    return this.heap[idx];
+    return this.heap[idx * 2];
   }
 
   getRight(idx: number): number {
-    idx = idx * 2 + 1
-    return this.heap[idx];
+    return this.heap[idx*2 + 1];
   }
 
   insert(item: number): void {
